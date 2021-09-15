@@ -1,0 +1,2055 @@
+8 Modules:-
+Algorithmic Thinking : Peak Finding
+Sorting and Trees    : Event Simulation
+Hashing 	     : Genome Comparision
+Numerics 	     : RSA Encryption
+Graphs		     : Rubik's Cube
+Shortest Paths	     : Route finding (Eg: Path from Caltech to MIT)
+Dynamic Programming  : Image Compression
+Advanced Topics	     : Complexity Theory, Research in Algorithms
+
+
+
+Peak Finder Problem:
+1-dimensional version 
+->Array of numbers => arr = [a,b,c,d,e,f,g,h,i]
+			position 2 is a peak if b>=a && b>=c
+			position 9 is a peak if i>h
+Problem - Find a peak if it exists in the given array
+
+1.StraightForward Algorithm:
+      [1,2,3,...,n/2,...,n-1,n]
+arr = [ , , ,...,   ,...,   , ]
+Start from left 
+	If the last element of the array is the peak, then it results in worst case complexity of Q(n), cause all n elements have to be looked on.
+
+2.Divide and conquer strategy
+	Break up this problem i.e, recursively berak up the 1-d array into smaller arrays and reduce the complexity. Eg: Binary search
+	Look at n/2, if arr[n/2]<arr[n/2-1], look at only the left half of the array,
+		     else if arr[n/2]<arr[n/2+1], look at only the right half of the array,
+		     else, n/2 position is a peak (which is the best case in this scenario)
+This algorithm includes 2-3 lines of careful reasoning.
+Now to look at the complexity of this algorithm, 
+	T(n) = T(n/2)+Q(1) =>Eventually, T(n/2)=>T(n/4) and so on leads to the base case, T(1) = Q(1)
+	Therefore, T(n) = Q(1)+Q(1)+...+Q(1) (log2n times)
+		   T(n) = Q(log2n)
+
+	
+2-dimensional version:
+->A 2D matrix of n-rows, m-columns
+arr = [ ,b, , 
+       c,a,d, 
+        ,e, ,
+        , , , ]
+	a is a 2D-peak iff a>=b, a>=c, a>=d, a>=e
+
+1.StraightForward Algorithm / Greedy Accent Algorithm:
+Picks a direction and follows it to find a peak
+For eg:
+arr = [  ,  ,  , 
+       14,13,12, 
+       15, 9,11,17
+       16,17,19,20]
+Starting at some arbitrary midpoint, the algorithm ha to make choices where to start, eg in the middle and keep going left/ keep going right and on hitting an edge go down/etc.
+Eg: Start at 12 and go left ->12,13,14,15,16,17,19,20 =>peak
+In this method we could end up touching a huge fraction or even all of the elements.
+It results in worst case complexity of Q(mn) which is nearly equal to Q(n^2) if m and n are nearly equal.
+
+2.Divide and Conquer Algorithm
+Trying to jam the binary search algorithm into the 2d version
+Pick a middle column j=m/2
+Find a 1D-peak at (i,j)
+Use (i,j) as a start to find a 1D-peak on row i.
+This algorithm gives a time complexity of 2Q(log2n) if m=n.
+This algorithm is efficient but *incorrect*, because if a comparision is made for along the row value and the next value is chosen, then it may no longer be a peak when compared column wise value.
+
+Attempt #2:
+2.Recursive Algorithm
+Pick a middle column j=m/2
+Find a global maximum on column j at (i,j)
+Compare (1,j-1), (i,j), (i,j+1)
+Pick left columns if(i,j-1)>(i,j), Similarly for the right columns if (i,j+1)>(i,j)
+	else (i,j)>=(i,j-1)>=(i,j+1) =>(i,j) is a 2D-peak
+Here we cut off half the columns, therefore, the matrix is cut off to half the size.
+When we have a single column, find the global maximum and were done.
+Now, to look at the time complexity of the algorithm,
+	T(n,m) = T(n,m/2)+Q(n)
+	T(n,1) = Q(n)
+	T(n,m) = Q(n)+...+Q(n) (log2m times)
+	T(n,m) = Q(nlog2m)
+
+
+
+
+What is an algorithm?
+-Computational procedure for solving a problem.
+	input -> algorithm -> output
+	program		 			<-> 	algorithm
+	(built on top of programming language)		(pseudocode / structured english)
+	(run on computer)				(model of computation)
+
+Model of computation specifies,
+	-what operations can be done by an algorithm 
+	-how much they cost(time) for each operation
+
+Two models of computation:
+O(1) - constant no. of / constant quantity of
+1.Random Access Machine (RAM)
+	-Random Access Memory - modeled by a big/giant array
+	-Eg: a 4GB RAM with 4Billion bytes and any address in between can be accessed by address in constant time.
+	-In constant time, an algorithm can
+		-readin/load O(1)/constant no. of words from memory
+		-do O(1) words/computations on them
+		-store O(1) words/write
+	-It accesses those words by registers/address from O(1) registers i.e, constant no. of registers
+	-Here, consider of words as w bits, not to worry about the data type/compatibility etc. Just considering them as comparable/computable data for the time being.
+	-Also, w - size of memory.
+	-This can also be related to assembly computation.
+	-This model does not use dynamic memory allocation.
+
+2.Pointer Machine
+	-Corresponds to object oriented programming in a very simple version.
+	-Dynamically allocated objects.
+	-Object has O(1) fields.
+	-field = word/variable (for eg: int)  or a pointer to objects/special value NULL.
+	-This model is also known as references.
+	-Eg: Linked list node with a data value and pointers to previous node, next node.
+These two models are simple and take constant time.
+	
+
+
+In a Python Model:
+1.List - array
+	L[i] = L[j]+5 => takes constant time.
+2.Object with O(1) attributes.
+	x = x.next -> O(1) time.
+For an operation eg: L.append(x), python does a process called table doubling - basically dine in constant time/O(1) time.
+Therefore, a lot of operations in python use algorithms.
+
+The operation L = L1+L2 takes a copy of arrays L1, L2 and appends to L.
+Basically,
+L = []
+for x in L1:
+	L.append(x)	{O(1)} => {O(|L1|)}
+for x in L2:					=>In whole, {O(1 + |L1| + |L2|)}
+	L.append(x)	{O(1)} => {O(|L2|)}
+
+for the operation x in L,
+	time complexity is linear since entire list may be needed to gone through.
+for the operation len(L),
+	time complexity is O(1), since in Python, the length of a list is stored in the beginning of the list.
+for the operation L.sort(),
+	time complexity is O(|L|log2|L|) / O(nlog2n) which is the time to compare.
+
+for storing a value in dictionary, D[key] = val => takes O(1) time assuming the key is a single word.
+In python, dictionaries are actually hashmaps.
+
+long in python, 
+operation x+y takes O(|x|+|y|) time.
+operation x*y takes O((|x|+|y|)^log3) time which is better than grade school algorithms.
+
+heapq.
+
+
+
+Document Distance Problem:
+->Compute distance between two documents.
+->Eg: For google, handling innumerable webpages and identifying if certain webpages are almost identical.
+	-d(D1, D2)
+Let, document = a sequence of words
+word = string of alphanumeric characters
+Here, to compare if documents D1, D2 are similar let's assume maybe they are similar if they have a lot of words in common.
+idea: shared words
+Let us think of a document as a vector,
+	D[w] = no. of occurences of w in the document D.
+Eg: 
+D1 = "the cat"
+D2 = "the dog"
+Let, the axes take values "the", "dog", "cat" for x, y, z
+Resulting equations will be similar to.
+D1 => xi+zk
+D2 => xi+yj
+To find the degree of difference between them, the dot product may be used.
+d'(D1, D2) = D1.D2 = ED1[w].D2[w]
+For the cat and dog, it is some measure of distance/commonality.
+High dot product => lot in common.
+The trouble is 
+	in case of a long document of 1Million and with 90% of words in common then their score is 900000.
+	in case of small documents and are identical but only with a score of 100
+	So it does not scale quite well.
+Dividing by the length of vectors would be a good solution.
+d'(D1, D2) = D1.D2/(|D1|.|D2|) - which is the cosine of the angle between the two vectors.
+
+So, the algorithm for it basically is,
+	1.Split document into words
+		-run through the document and store the word frequencies in dictionary
+		- for word in document:
+			count[word] += 1	{O(|word|}, 	therefore in overall time complexity, {O(|document|)}
+	2.Compute word frequencies
+	3.Compute dot product
+
+/
+
+SORTING:
+Why sorting?
+Real case : Address Book, Telephone Directory
+Problems become easy once items are sorted
+Eg:
+Finding a median-
+	Consider a bunch of items-
+	array[0:n] -> B[0:n]
+	unsorted      sorted (eg: increasing)
+	If the items are records rather than integers, a comparision function is required.
+	Not always correct or efficient method but a method of unit time is to select the mid element i.e, B[n/2]
+In various searches such as binary search reducing the time from linear to logarithmic time using divide and conquer paradigm.
+Subroutine in data compression(Eg: document distance frequency computation by sorting, grouping and counting)
+Computer Graphics - many layers corresponding to scenes and are rendered front to back and needs to be ordered properly.
+
+
+
+Insertion Sort:
+For i=1,2,3,...,n
+	insert A[i] into the sorted array A[0:i-1]
+	executing by pairwise swaps down to the correct position for the number that is initially A[i].
+Eg: [5, 2, 4, 6, 1, 3]
+	^
+	|
+	key
+    performing a pairwise swap
+    [2, 5, 4, 6, 1, 3]
+	   ^
+	   |
+    another swap
+    [2, 4, 5, 6, 1, 3]
+	      ^
+	      |
+    no swap since it is ordered correctly and the key is simply moved one step to the right
+    [2, 4, 5, 6, 1, 3]
+		 ^
+		 |	
+    Four swaps are performed to position 1 at the beginning of the array
+    [2, 4, 5, 1, 6, 3]
+	      ^
+	      |
+    [2, 4, 1, 5, 6, 3]
+	   ^
+	   |
+    [2, 1, 4, 5, 6, 3]
+	^
+	|
+    [1, 2, 4, 5, 6, 3]
+     ^
+     |
+    Now, the key is pointed at position of 3
+    [1, 2, 4, 5, 6, 3]
+     		    ^
+     		    |
+    Three more swaps are performed to position 3 correctly
+    [1, 2, 4, 5, 3, 6]
+     		 ^
+     		 |
+    [1, 2, 4, 3, 5, 6]
+	      ^
+	      |
+    [1, 2, 3, 4, 5, 6]
+	   ^
+	   |
+
+    In terms of key positions, there are Q(n) steps.
+    On every key position, it's quite possible Q(n) work may be needed, here in case of position 1.
+    If the array is reverse sorted, then on each key position an average of n/2 steps need to be performed and therefore each step is Q(n) compare and swaps.
+    Thus this algorithm is of complexity Q(n^2).
+    In case object is not a number rather a record, the comparision could be more expensive.
+    Therefore, in general comparision step is the operation we will be counting and assuming that all comparisions are substantially expensive than swaps.
+    comparision >> swaps.
+    Replacing the no. of compares by using binary search in the sorted part of the array A[0:i-1] time can be reduced to Q(nlogn) time in terms of comparision. However, inserting A[i] in particular position however might end up shifting a lot of things and therefore the time complexity for swapping would still remain Q(n^2).
+
+
+
+Merge Sort:
+Divide and conquer
+Standard recursive algorithm similar to binary search
+
+We split the array A into two parts L and R.
+Most of the work is done at the bottom merge routine, where initially the array is split by half its size.
+Then, from the bottom, they are combined to form an array of size 2, then of size 4 in general and it finds its way upwards.
+[	A	]	size = n
+	|
+	V
+[   L   ][   R   ]	2 arrays of size = n/2
+    |	     |
+    V	     V
+   sort	    sort
+[   L'  ][   R'  ]	2 sorted arrays of size = n/2
+     \      /
+       merge
+[ Sorted array A ]	sorted array of size = n
+
+Merge-
+	Assumes presence of two sorted arrays and merges them together
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = []
+	      ^			    ^
+	      |			    |
+	Two pointers are used to point the first element in two arrays and compare them to find the smaller element and appends it to the result and the pointer is moved to the next step.
+	This process is continued till the entire resultant array is obtained.
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1]
+	      ^			       ^
+	      |			       |
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2]
+	      	 ^		       ^
+	      	 |		       |
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7]
+	      	    ^		       ^
+	            |		       |
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7, 9]
+	      	    ^			  ^
+	      	    |			  |
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7, 9, 11]
+	      	    ^			      ^
+	      	    |			      |
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7, 9, 11, 12]
+	      	    ^			    	^
+	      	    |			    	|
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7, 9, 11, 12, 13]
+	      	    	^			^
+	      	    	|			|
+	L' = [2, 7, 13, 20],  R' = [1, 9, 11, 12], res = [1, 2, 7, 9, 11, 12, 13, 20]
+	      	    	  ^			^
+	      	    	  |			|
+	And, that is the merge routine.
+	Splitting the array involves if the array is odd or even to be likely, L = A[0:n//2-1], R = A[n//2:].
+	The merge routine takes Q(n) time.
+	The overall complexity of the algorithm takes Q(nlogn) time.
+	
+	The recurrence for the merge sort would be something like,
+		T(n) = C1 		+   2T(n/2)	   +   C.n
+		      (dividing part)	  (recursive part)   (merging)
+	Considering merging to be the primary operation, C.n -> C.n/2, C.n/2 -> C.n/4, C.n/4, C.n/4, C.n/4 -> and so on till n/factor becomes one.
+	i.e,^ 			C.n
+	    |		/		\
+	    |	       C.n/2		C.n/2
+	    |	  /	      \	     /		\
+	 levels  C.n/4	    C.n/4  C.n/4       C.n/4
+	 1+logn	  .	.	.	.	.	
+	    |	  .	.	.	.	.
+	    |	  .	.	.	.	.
+	    |	  C .	.	.	.     . C
+	    V	  <-----------n leaves------------>
+
+	At each level, the no. of array elements to merge remains the same n, i.e, n, n/2+n/2=n, n/4+n/4+n/4+n/4=n and so on.
+	Hence there are logn+1 levels and C.n work related to each level,
+		T(n) = (logn+1).Cn
+		     = Q(nlogn)
+	One disadvantage of merge sort is it requires a Q(n) auxiliary space to make a copy of the given array to perform merging sort operation on it i.e, the arrays L and R are disjoint from the given array A.
+	For an in-place sort for eg, insertion sort, only one temporary variable is needed for swapping and operation is performed on the array itself making its space complexity Q(1).
+	In-place merge sort is a method available but it's running time is much worse.
+	In python,
+		for merge sort, T(n) = 2.2nlogn ms
+		for insertion sort, T(n) = 0.2n^2 ms
+	In C,
+		for insertion sort, T(n) = 0.01n^2 ms
+	
+
+
+
+HEAPS:
+Priority Queue-
+A structure that implements a set S of elements, each of these elements is associated with a key.
+Set of operatins that we'd wish to perform on a heap data structure/ priority queue,
+	Insert(S,x): insert element x into set S.
+	max(S)	   : return element of S with the largest key.
+	extract_max(S): return element of S with the largest key and remove it from the set S.
+	increaseKey(S,x,k): increase the value of x's key to the new value k.
+
+Heap:
+An array visualised as a nearly complete binary tree.
+Eg: [16, 14, 10, 8, 7, 9, 3, 2, 4, 1]
+      1   2   3  4  5  6  7  8  9  10
+For visualising it, index 1 is the root of the tree, indices 2,3 are the children of 1, indices 4,5,6,7 are the children of 2 and 3 and so on.
+i.e, 			1
+		        16
+		    /	    \
+		2		3
+		14		10
+	      /	   \	      /	   \
+	   4	     5	    6	     7
+	   8	     7	    9	     3
+	 /   \	    /
+	8      9  10
+	2      4   1
+
+Heap as a Tree:
+The root of the tree : first element (i=1)
+parent(i) = i/2
+left(i) = 2i,	right(i) = 2i+1
+
+Max-Heap property:
+The key of a node >= keys of its children
+Min-Heap property:
+The key of a node <= keys of its children
+
+For max(S) operation, the procedure is trivial as the heap need not be modified.
+However, for the extract_max(S) operation, the heap needs to be modified and there arises the problem of how to maintain the max heap property.
+There can be trivial array that is neither a max heap nor a min heap
+Eg: A = [2, 4, 1]
+	Here A is neither a max heap nor a min heap
+		2
+	       / \
+	      4	  1
+Heap operations to implement and analyze the complexity for:
+build_max_heap : produces a max heap from an arbitrary/unordered array
+	Procedure for building a max heap-
+	max_heapify : Correct a single violation of the heap property in a subtree's root
+max_heapify (A,i): Assume that the trees rooted at left(i) and right(i) are max heaps.
+If this condition is violated, then return a max heap rectifying this violation.
+Eg: 			16
+		    /	    \
+		 4	       10
+	      /	   \	     /	  \
+	    14	     7	    9	   3
+	  /   \     /
+	2      8   1
+Here, since the parent 4 violates the max heap property, max_heapify(A,2) is called.
+Comparing the two childs it has, the greater child i.e, 14 is swapped.
+Exchange A[2] with A[4]
+ 			16
+		    /	    \
+		14	       10
+	      /	   \	     /	  \
+	    4	     7	    9	   3
+	  /   \     /
+	2      8   1
+Reaching its children recursively, the max heap property is violated again at child 4 and max_heapify(A,4) is called.
+Exchange A[4] with A[8]
+ 			16
+		    /	    \
+		14	       10
+	      /	   \	     /	  \
+	    8	     7	    9	   3
+	  /   \     /
+	2      4   1
+
+Heap sort:
+Convert A[1...n] into a max heap.
+1.Build max_heap(A): (from unordered array)
+	for i = n/2 down to 1
+		do max_heapify(A,i)
+This is because, for any heap the elements A[n/2+1 ... n] are leaves
+Since, n/2 elements need to be visited and operated and each operation takes log(n) time, it has time complexity of O(nlogn) by normal analysis.
+However, in a careful analysis in the leaf level, the no. of nodes are high but have a unit no. of operations. And in the root level, the no. of nodes is 1 but have logn no. of operations/swaps.
+	i.e, Max_heapify takes O(1) for nodes that are one level above the leaves.
+	And in general, O(l) times for nodes that are l levels above the leaves.
+We have n/4 nodes with level 1, n/8 with level 2, ..... , 1 node at logn level.
+Therefore, the total amount of work in the for loop can be summed as,
+	(n/4(1.C) -> we have one level and constant amount of work for that level)
+	n/4(1.C) + n/8(2.C) + n/16(3.C) + ... + 1(logn.C)
+To make it easier to look at, set n/4 = 2^k
+	C.2^k(1 + 2/2 + 3/4 + ... + (k+1)/2^k)
+	C.2^k( 1/2^0 + 2/2^1 + 3/2^2 + ... + (k+1)/2^k )
+	C.2^k.(expression bounded by some constant say m )
+	C.2^k.m
+	C.m.n/4
+	Therefore, it has a complexity of Q(n)
+2.Find max element A[i]
+3.Swap elements A[n] with A[i]
+	now, the maximum element is at the end of the array
+4.Discardnode n from heap by decrementing the heap size
+5.new root may violate the max heap but the children are max heaps - hence run max heapify to rebuild it.
+
+Build max heap from unordered array takes O(n) time as discussed.
+Max heapify takes O(logn) time.
+Hence, the algorithm in total takes O(nlogn) time.
+
+
+
+
+Scheduling and Binary Search Trees:
+Runway Reservation System:
+Airport with a single runway:
+Reservations for future landings - It's what the system is really built for.
+Reserve request for landings - specifies landing time t.
+Add t to the set R of landing times, is no other landings are scheduled within k minutes.
+Here, for most of our problems, let's assume the interval between landing times of the planes i.e, the value of k = 3 minutes.
+
+Remove t from the set R after the plane lands.
+Quite interesting data structure, and it is desired to do all of these operations in O(logn) time.
+
+Eg:	----.------.-----.--------.--> time
+	   37     41.2  49       56.3
+	  now
+	New request - landing time 53 => 4 ahead of 49, 3.3 behind 56.3 both larger than k =>hence OK
+				   44 => not allowed - very close to 41.2 i.e, interval=2.8<k
+				   20 => not allowed - can't schedule in the past
+
+Previous Data Structures analysis for this problem
+1. Unsorted list/array:
+	All operations are linear (except insertion), hence time complexity of O(n) and hence not efficient.
+	Insertion takes O(1) time, but check for insertion takes O(n) time as well.
+2. Sorted array:
+	Checking and finding the insertion point takes logarithmic time as required with the use of binary search.
+	It can,
+		Find smallest i such that R[i]>= t in O(logn) time
+		Compare R[i] and R[i-1] against t in O(1) time.
+	However, the actual insertion requires shifting and could take O(n) time, since it is an array.
+3. Sorted list:
+	O -> O -> O -> O
+	In a linked list with pointers, the insertion can be done in O(1) time.
+	However, binary search cannot be performed on list.
+4. Heaps:
+	They are actually a weak invariant.
+	Min/max element could be found in unit time.
+	But to find the existence an element that is <=k or >=k, it takes O(n) time, i.e, each element has to be traversed through.
+
+	Among the data structures reviewed, the sorted arrays were pretty close. Only problem to solve with it is to find a solution for faster insertion, and that is possible in BST.
+
+
+Binary Search Trees:
+Eg:		30
+	    /	     \
+	17		40
+      /	   \
+    14	     20
+For a binary tree, we have-
+	node X : key(x)		(Node say X and a key for each node eg: 30, 17, etc)
+	Pointers: parent(x), left(x), right(x)	(parent, left child, right child for each node)
+	(Unlike a heap)
+Therefore, it is a tree and not just a tree visualization like in a heap.
+It takes few more bytes to store every node of the binary search tree.
+
+Invariant:
+For all nodes x, if y is in the left subtree of x, then key(y) <= x
+                 if y is in the right subtree of x, then key(y) >= x
+
+Let's review how this applies to the runway reservation problem
+Starting with a null set of elements R, and start inserting;
+Insert 49	->	Make a node that has a key value of 49
+		49
+Insert 79	->	Compare 49 and 79, since 79>49, go to right and attach 79 to the right child of 49
+		49
+		    \   
+			79
+Insert 46	->	Compare 49 and 46, since 46<49, go to the left and attach 46 to the left child of 49
+		49
+	     /	    \   
+	46		79
+Insert 41	->	Compare 41 and 49, 41<49, go to left, check 46 and 41, since 41<46, go to left and attach 41 to the left child of 46
+		49
+	     /	    \   
+	46		79
+      /
+    41
+(K minute check, k=3)
+Insert 42	->	Compare 42 and 49, 42<49 go left
+			Compare 42 and 46, 42<46 go left
+			Compare 42 and 41, 42>41 go right (But here |41-42|=1 < k i.e, 1<3)
+				Since the k minute check is violated, 42 cannot be added in the tree.
+
+If h is the height of the tree, then insertion with or without check takes place in O(h) time.
+
+In a BST, to find ,
+	find_min() - keep going to the left till leaf : O(h) complexity
+	find_max() - keep going to the right till leaf : O(h) complexity
+	next_larger(x) - O(h) time
+
+New requirement,
+	Rank(t) - how many planes are scheduled to land at times <= t
+
+Augment the BST structure:
+		49
+	     /	    \   
+	46		79
+		      /	   \
+		   64	     83
+	Let us have an extra number associated with each nodes, now the key value has two values associated.
+	During insertion and deletion, let us mdify these numbers which are the subtree sizes.
+		49(5)
+	     /	    \   
+	46(1)		79(3)
+		      /	   \
+		   64(1)     83(1)
+	The subtree size includes the node itself and the number of all nodes underneath it.
+	This number is arrived by defining how insert and delete operations modify these numbers.
+	
+	For eg: Insert 43
+	      49(5+1)
+	     /	    \   
+	46(1+1)	      79(3)
+      /	     	     /	   \
+    43(1)	  64(1)     83(1)
+	Now, the K minute check makes it more challenging.
+	Trivial way to solve the problem - Go with the normal insert, 
+		if the k minute check fails, then no further operation needed
+		if the k minute check is successful, then increment each of the nodes that we pass through by one.
+	
+	Now, to find the actual value of Rank(t)-
+	       49(6)
+	     /	    \   
+	 46(2)	      79(3)
+       /     	     /	   \
+    43(1)	  64(1)     83(1)
+	A subtle question - what lands before t? to find in O(h) time
+		1. Walk down the tree to find the desired time
+		2. Add in the nodes that are smaller.
+		3. Add in the subtree sizes to the left.
+
+	Eg: t=79
+		Starting with 49,
+			49	add 1
+	49<79 (move right)	add 2	(subtree 46 since 79>49 and all the nodes in the left subtree ar < 79)
+	(79 <= 79)	79	add 1
+	(left subtree of 79)64	add 1	
+	Hence, Rank(79) = 5
+
+But, the one bad thing in the BST is that the operations could take as long as O(n) if all the elements of the BST are / almost in a straight line.
+Hence, the notion of self balancing BST or AVL tree is introduced.
+
+
+
+
+BALANCED BSTs:
+	importance of being sorted
+	each node has
+		key
+		left pointer
+		right pointer
+		parent pointer
+	BST Property
+	
+	BST support insert, delete min, max, next larger/smaller (successor/predecessor) in O(h) time
+		h - height of the BST -> h is not always logn, which is the issue of balancing
+	
+	In ideal case, a BST would be like,
+	       r
+	    /	  \
+	  n         n
+        /  \       /  \
+       l    l	  l    l, which is perfectly balanced and h = log(n)
+	
+	However, a BST can be perfectly unbalances as well.
+	r
+	 \
+	  n
+	   \
+	    n
+	     \
+	      n
+	       \
+	        l , which is very unbalanced and h = n.
+
+Height of a node:
+Length of the longest path from it down to the leaf.
+	        49(3)
+	     /	      \   
+	 46(2)	       79(1)
+       /     \ 	       /   \
+    43(0)    48(1)  64(0)   83(0)
+	     /
+	   47(0)
+height(node0 = max(height(leftChild)+1, height(rightChild)+1)
+
+
+
+
+
+AVL TREES:
+Requires height of left child and right children of every node to differ by at most 1.
+	i.e, (|height(leftChild) - height(rightChild)| <= 1)
+AVL Trees are balanced:
+	height = log(n)
+Worst case - Right subtree has height 1 more than left for every node.
+Let Nh = min # of nodes possible in an AVL tree of height h. (h = log(n), so inverse should do. i.e, n = (exponent)^h)
+
+To analyze Nh,
+	for the base case (N(O(1))) = O(1)
+	Therefore, the recursive formula looks like,
+		Nh = 1 + N(h-1) + N(h-2)
+	cause, our tree generally looks like,
+		O
+	    /	    \
+	 left	   right
+	subtree	  subtree
+			\
+			 l, here the height of the tree is the maximum of the left, right subtrees and with a maximum height difference of 1. The larger has a height h-1, smaller has height h-2.
+	It would be convenient if the expression is exponential.
+	Having a look at this recursive formula, it is very close to fibonacci with the excess of additional 1.
+	Therefore, Nh > Fh
+	The recursive expression for fibonacci series turns out to be exponential as a matter of fact and it values to ,
+		Fh = (si)^h/sqrt(5), si ~= 1.618
+	Therefore, (si)^h/sqrt(5) < Nh
+	~(si)^h/sqrt(5) < Nh
+	~h-- < log(n)/log(si)
+	~h-- < 1.440(log(n))  ---- 1
+
+	Now, to solve the recurrence,
+		Nh = 1 + N(h-1) + N(h-2)
+		Nh > 1 + 2*(N(h-2))
+		Nh > 2*(N(h-2))
+		Nh > Q(2^(h/2))
+	From this equation,
+		h < 2(log(n))   ---- 2
+
+	The real answer is 1, but this second method is an easier derivation and ultimately gives Q(log(n)) excluding the answer.
+
+
+AVL INSERT:
+1. Simple BST insert.
+2. fix AVL property
+	- from the inserted node, move up till the node violating the AVL property is reached.(Let x be the lowest node violating AVL)
+	- assume x.right is higher (/has more height).
+	- if x's right child is right heavy, then perform a left rotation on x.
+	- if x was doubly right heavy on right child z, z's left child y, then perform a right rotation on z, then a left rotation on y.
+Eg:
+	        41(3)
+	     /	      \
+	 20(2)	       65(1)
+       /     \ 	       /   \
+    11(0)    29(1)  50(0)   83(0)
+	     /
+	   26(0)
+
+	Insert 23
+	        41(4)
+	     /	      \
+	 20(3)	       65(1)
+       /     \ 	       /   \
+    11(0)    29(2)  50(0)   83(0)
+	     /
+	   26(1)
+	   /
+	 23(0)	, here 23, 26, 29 are in a straight path and is our area of concern.
+
+	Here, rotations come into play and can be quite helpful.
+
+
+Rotation:
+
+		x						y
+	     /	   \            Left Rotate(x)		    /	    \
+	    A	     y        ---------------->	   x	   x	      C
+		   /   \				 /   \
+		  B	C				A     B
+	The process takes O(1) time
+	Also, the inorder property is retained.
+
+	The inverse of this operation is a right rotate.
+
+		x						y
+	     /	   \            Right Rotate(x)		    /	    \
+	    y	     C        ---------------->	   x	   A	      x
+	  /   \				 			    /   \
+	 A     B						   B     C
+
+	This helps in balancing during unbalanced insertions,
+	Eg:
+		O
+	       /	Right Rotate		O
+	      O		------------>	      /	  \
+	     /				     O	   O
+	    O
+
+	Therefore transforming our tree,
+	        41(4)								41(3)
+	     /	      \   						     / 	      \
+	 20(3)	       65(1)		Right Rotate			 20(2)	       65(1)
+       /     \ 	       /   	       -------------->		       /     \ 	       /
+    11(0)    29(2)  50(0)   				    	    11(0)    26(1)  50(0)
+	     /								    /   \
+	   26(1)							 23(0)	29(0)
+	   /
+	 23(0)
+
+	Now, insert 55
+		41(3)
+	     / 	      \
+	 20(2)	       65(2)
+       /     \ 	       /
+    11(0)    26(1)  50(1)
+	    /   \      \
+	  23(0)	29(0)	55(0)
+
+	For this case,
+		1.Do a left rotate on 50
+		2.Do a right rotate on 65
+
+		  41(3)
+	     / 	         \
+	 20(2)	           65(2)
+       /     \ 	           /
+    11(0)    26(1)       50(1)
+	    /   \        /
+	  23(0)	29(0)  55(0)
+
+		41(3)
+	     / 	      \
+	 20(2)	        50(1)
+       /     \ 	       /    \
+    11(0)    26(1)  55(0)   65(0)
+	    /   \
+	  23(0)	29(0)
+
+
+AVL Sort:
+To sort n numbers,
+	insert n numbers - O(nlogn)
+	do inorder traversal - O(n)
+
+Abstract data types:
+Operations supported by AVL Tree,
+	insert, delete
+	find min
+	successor, predecessor
+
+
+
+
+Linear Time Sorting:
+comparision model - model of computation : for lower bounds of sorting
+lower bounds
+	searching: Q(logn)
+	sorting : Q(nlogn)
+O(n) sorting algorithms
+	counting sort
+	radix sort
+
+Comparision Model:
+-all input items are black boxes (ADTs - abstract data types)
+-only operations allowed are comparisions (<, <=, >, >=)
+-time cost = # of comparisions
+To prove the lower bounds, the notion of decision tree can be introduced
+
+Decision Tree:
+Any comparision algorithm can be viewed as a tree of all possible comparisions and their outcomes, and the resulting answer.
+For any particular value of n, eg: Binary Search for n=3
+	A	_ _ _
+		0 1 2
+
+		         A[i] < x?
+	           No/	               \Yes
+	    A[0]<x?		        A[2]<x
+	  No/    \Yes		  No/          \Yes
+     x<=A[0]   A[0]<x<=A[1]   A[1]<x<=A[2]     A[2]<x
+
+	This tree for a binary search turns out to be of exponential size (2^3), and this is not actually encouraged unless the algorithm is to be analysed.
+
+	The components corresponding to a decision tree and algorithm can be viewed as follows,
+
+	Decision Tree				Algorithm
+	-------------				---------
+	Internal Node				Binary Decision (Comparision)
+	Leaf					Answer
+	Root to leaf path			Algorithm Execution
+	Length of the path			Running time of execution
+	Height of the tree			Worst case running time
+
+	Here, the decision trees are actually binary trees and make answers to complex questions simple.
+
+
+Searching Lower Bound:
+We have n preprocessed items.
+Finding a given item among them in the comparision model (only operations allowed are comparisions), requires Q(logn) in the worst case.
+
+Proof:
+Decision tree is binary and must have >= (atleast) n leaves, one for each answer.
+Therefore, a binary tree with atleast n leaves => height >= logn, hence logn is the least no. of operations possible.
+
+
+Sorting Lower Bound:
+Typical Comparision - 	A[i]<A[j]?
+		      No/	\Yes
+Swaps dont appear as we are just looking at comparisions.
+Leaves are the interesting part,
+	| Getting
+	|  down
+	| to the
+	| leaves
+    A[5]<=A[7]<=A[1]<=A[0]<=.....
+	Only comparisions are costed.
+
+Decison tree is binary and the no. of leaves >= No. of possible answers(n!)
+Therefore, height >= log(n!)
+		  >= (log(n.n-1.n-2......1)
+		  >= (log(n) + log(n-1) + log(n-2) + ... + log(1))
+		  >= (summation of all log elements values from 1 to n)
+		  >= (this can be viewed as an integral of log(x) over 1 to n)
+		  >= nlogn-n
+		  >= Q(nlogn)
+	Therefore, lower bound for sorting is nlog(n).
+
+
+
+Linear-Time sorting:(Integer Sorting)
+- assume n keys for sorting are integers
+- assume the keys/integers are non negative E{0, 1, 2, 3, ....., k-1} (and each fits in a word (- words are machine word/things that can be maipulated in constant time)).
+- can do a lot more than comparisions.
+- for k-- (not too big) sorting can be done in linear time O(n).
+- The best algorithm so far has a complexity of O(n.sqrt(log(log(n))) with a high probability.
+- The first algorithm to achieve O(n) is counting sort.
+
+
+Counting Sort:
+Basic idea is counting
+Run through the array,
+	Eg: A - 3 5 7 5 5 3 6
+	# of 3-2, 5-3, 6-1, 7-1
+	3 is smallest key and 2 nos. ,
+	33
+	and then 3 5's
+	33555
+	and then 1 6's and then 1 7's
+	3355567
+
+=>L = array of k empty lists	- O(k)
+for j in range(n):
+    L[key(A[j])].append(A[j])	- O(1)
+output = []
+for i in range(k):
+    output.extend(L[i])		- O(n)
+
+Therefore, running time of this algorithm = O(n+k)
+If k happens to be close to n, the running time of this algorithm is O(n).
+Else if k turns out to be much bigger, then we may end up in a trouble.
+
+
+Radix Sort:
+Excel spreadsheet approach
+-Imagine each integer as bunch of columns ( as some arbitrary base b )
+-Then each integer will have some sequence i.e, is a sequence of digits
+-If maximum value is k, then the no. of digits to call for each number = logb(k)+1
+-Normally log2 is thought of since computer base systems operate in binary.
+-Sort the integers by least significant digit
+		|     next least significant
+		|
+		|
+		|
+		|
+ Way down to sort the most significant digit
+
+	Sort by digit using counting sort
+	For each digit sort, it takes a time of O(n+b), cause all digits are less than or equal to b.
+	Since the process has to be repeated for each digit in the number, the total time complexity results to O((n+b).d)
+	Here, d is the no. of digits and hence,
+		time complexity = O((n+b).logb(k))
+		(this value is optimal when b=n)
+		time complexity = O((n).logn(k))
+		If k turns out to be less than or equal to some polynomial in c, i,e k <= n^c, then the complexity is linear
+		time complexity = O((n).logn(n^c))
+		time complexity = O(n.c)
+
+
+
+HASHING :
+Dictionary - Abstract Data Type ( ADT )
+	maintains set of items, each with a key
+	- insert (item) : (overwrites any existing key)
+	- delete (item)
+	- search (key) : return item with given key
+			  or report key doesn't exist
+
+One way to solve dictionaries is to use balanced BST like AVL trees which does all of these operations in O(logn) time.
+AVL trees do give more information while searching, anyways it does the search.
+
+From the decision tree theorem, it was established that the least bounds for searching = O(logn), for sorting = O(nlogn)
+However, in the RAM model, the sorting was achieved at a time close to O(n) provided some necessary conditions though.
+Now, let's try doing search in O(1) time with a very few assumptions like, the keys are integers with high probability.
+
+It is a randomised data structure and involves probability.
+In Python:
+	dict[key]	~ search
+	dict[key] = val	~ insert
+	del dict[key]	~ delete
+For a python dictionary, item is a pair of key and a value => (key, value).
+
+Need for dictionary:
+-Best way to do document distance problems.
+-Almost every database use either hashing/hashtable or search trees.
+-Compilers and Interpreters (Eg; variable name accessed by a program searches for the address associated, and a dictionary stores the address of all the local variables, global variables, etc)
+-In the internet, there are hashtables all over (Eg: a router needs to know the ip address of all the machines connected to it and when it receives a packet along with an ip address, it looks up in the dictionary and identifies the machine associated with it to send, network stack of a machine i.e, port to program data stored in dictionary.
+-Substring searching.
+-String Commonalities
+-Directory/File Synchronisation.
+-Cryptography
+
+
+Simple Approach:
+Direct Access Table
+	- A big table and the index of the array is the key
+	- Store items in array indexed by key
+0 __ None
+1 __ None
+2 __ item2
+3 __ None
+4 __ item4
+.
+.
+.
+n __ None
+
+
+Problems with this approach:
+- 1. Keys may not be positive integers
+- Large memory hog
+
+
+Solution to this problem 1:
+- map keys to non negative integers.
+- In theory, keys are finite and discrete. (Anything on the computer can ultimately be written as string of bits, and string of bits in turn is an integer.
+- In python, hash(x) is the prehash of x, which mas the object to an integer.
+	for an integer, the hash(x) returns an integer. For a string, it does something but there are some issues, for eg,
+	hash('\0B') = hash('\0\0C') = 64
+- But ideally hash(x) = hash(y)  <=>  x = y, but sadly in python this is not quite sure but mostly true.
+- For a custom object, __hash__ method can be used to define what happens to the object when hash(object) is called. If not defined, then the default value of id is returned which is the address/physical location in which it is to be stored.
+- The defined hash method must be so that it's result value does not change by time.
+
+Solution to this problem 2: Hashing
+- Take the set of all possible keys (integers) and reduce them into reasonable integers of size m for the table.
+- The set of the keys would be really massive, and a direct access table assignment would not really be beneficial.
+- So, we map the keys using a hash function h down to smaller set like an array with possible values from 0 to m-1 where m is the size of the hash table.
+- From the large set of keys/keyspace there exists a subset of keys that are actually stored in this set/dictionary.
+- Based on the memory allocation and many other factors, the set may change but at any point of time there always exists a set of keys in the keyspace available.
+- Now, a hash function is required to map them. Let the keys in the keyspace be k1, k2, ...., km,
+	If hash(k1) = 2, hask(k3) = 0, then they are mapped in the array/hash table accordingly.
+	0 _____ item3
+	1 _____
+	2 _____ item1
+	. _____
+	. _____
+	. _____
+      m-1 _____
+
+- Therefore, the idea is for m = O(n), where n is the no. of keys in the dictionary.
+	In this case the space is not gigantic or hogged, it would be linear.
+- Hence, the function hash is of the prime focus here.
+- It is necessary to avoid two keys getting mapped to the same integer which is the case of collisions.
+	i.e, hash(ki) = hash(kj) but, ki != kj
+
+There are 2 techniques to deal with collisions,
+1. Chaining
+2. Open Addressing
+
+
+1. Chaining:
+- Idea is, if there are multiple keys for same position, then save them as a linked list in that slot of the hash table.
+- Let K be the set of keys present for the hash table from the whole keyspace, and
+	let there be a collision of keys k1, k2. i.e, hash(k1) = hash(k2) = 1, then (let hash(k3) = m-1)
+		0 _____ --> None
+		1 _____ --> item1 --> item2 --> None
+		2 _____ --> None
+		. _____ --> None
+		. _____ --> None
+		. _____ --> None
+	      m-1 _____ --> item3 --> None
+
+- So, for the worst case, all the keys may map to the same index and we'll end up with a data structure no better than a linked list. So, the worst case is O(n).
+- But for an average case or the best case, the time complexity is O(1).
+
+
+Simple Uniform Hashing:
+- Each key is equally likely to be hashed to any slot of the table, independent of where other keys hashing.
+
+Analysis:
+- expected length of a chain for n keys stored in the table, m slots in the table = n/m
+	Chance of each key = 1/m; adding n keys/doing it n times, the chance/probability for at least one key to be in a slot = n/m.
+- Here, the n/m is the load factor, @(Substitute for alpha). If m==n, then load factor is 1.
+- As long as m = Q(n), the time complexity remains Q(1).
+- The running time of the algorithm = O(1 + |chain_length|) = O(1 + @).
+
+Hashing Methods:
+Three of the theoretical hashing methods are,
+1. Division Method:
+	Just take the key k and the table size m and,
+		hash(k) = k mod m
+	If m has common factors with k, then this method is pretty bad.
+	This method is good if m is prime, not close to power of 2 or power of 10.
+
+2. Multiplication:
+	hash(k) = [(a.k)mod 2^w]>>(w-r)  , where k is a w bit integer.
+	- Take the key k, a is random integer among possible w integers.
+	- Multiply the binary k by adding it k times and get remainder of 2^w, and then right shift by w-r positions.
+	- Thus, we obtain the leftmost r bits among the rightmost w bits.
+	In practice, this works quite well most of the time.
+	Works well if a is odd, and not very close to the power of 2.
+
+3. Universal Hashing:
+	This is one of the methods for universal hashing.
+	hash(k) = [(a.k+b)mod p] mod m
+	- a, b = random numbers between 0, p. p is a prime number bigger than the keyspace size.
+	- The mod m is performed just to make sure the number is between 0 and m-1.
+
+for worst case, keys k1 != k2,
+	the probability(hash(k1) = hash(k2)) = 1/m
+	which is the probability over a, b which are random.
+	Still the load factor is n/m and expected running time for this hash function is constant for constant load factor.
+The third method is theoretically good, first two methods are not theoretically good but still common in practice.
+
+
+
+We have to create a table of size m. We like m to be about the same as n. But value of n is unknown which is n insertions and can become higher with large number of insertions.
+However, if m is very large, the space occupancy is high and the hashing would be ultimately slow.
+So, How To Choose m?:
+	we want m = Q(n)
+		=> @(Substitute for alpha) = Q(1).
+Idea:	- Start small; m = 8 (power of 2)
+	- Grow, shrink the table as necessary
+
+If n > m:  grow table.
+
+Grow Table:
+	m -> m'
+	To do this, allocate new memory location for the table of size, and do rehashing of all the keys in the set of keys of interest in the key space.
+	- make table of size m'.
+	- build new hash function hash'
+	- rehash:
+		for each item in T(old table):
+			T'(new table).insert(item)
+	The time complexity would be Q(n+m+m'), but for our case, it will be Q(n) since m, m' are always close to Q(m).
+	A new hash function is required because, for the old hash function size was m and for new table size would be m'.
+
+The size of the new hash table, m' = 2m.
+Let's just consider m' = m+1
+	For each extra insert, memory allocation, hashing, hash function, everything needs to be rebuild and the complexity results in a polynomial value, t = Q(1 + 2 + 3 + .... + n) = Q(n^2)
+
+Therefore, m' = 2m: cost of n inserts, t
+	The cost to rebuild each time is twice than that of the previvous time until n is reached. Therefore,
+	t = Q(1 + 2 + 4 + 8 + .... + n)		[ logn steps ] ( Geometrically it is bound by a constant 2n. Hence,)
+	t = Q(n)
+This process is called table doubling. Here, only log(n) operations take Q(n) time to rebuild, other operations take place in Q(1) time and therefore Q(n) remains the time bound for this operation and amortisation comes into play.
+
+Amortisation:
+- Operation takes "T(n) amortized"
+	if an individual operations take T(n) time and if k operations are performed, then they altogether take <= k.T(n) time
+- Think of meaning
+	~ "T(n) on average", where average over all operations.
+
+Table Doubling:
+k inserts
+	take Q(k) time
+Q(1) amortized/insert.
+Also, k inserts and deletes take Q(k).
+	For deletion, and rebuilding is not necessary.
+If large number of deletions take place, then m >> present value of n and to fix that table needs to be shrinked/resized.
+
+1st way, if m = n/2, then shrink to m -> m/2
+	But the problem is, if m = 8, m = 9 i.e, consecutive insertion, deletion takes place at these borders, then for every operation Q(n) time is costed and this is slow.
+	To solve this,
+
+2nd way, if m = n/4, then shrink to m -> m/2.
+	Here, for the denominator, any number greater than 2 would work but it is better to stick to powers of 2.
+	So, even at the borders, for growing the table size again, almost n/2 space would be remaining to fill in.
+	Here, the amortized time = Q(1)
+	The value of m is bound by, n <= m <= 4m
+
+Using this table doubling, not just the hashing problem, but python lists are also implements this idea.
+Python lists are resizeable arrays.
+	___________________
+	we can access,
+		i'th item in O(1) time.
+		append in O(1) time
+		delete last item pop in O(1) time
+		but pop(0) takes O(n) time.
+	The O(1) operations are actually constant amortized since, they use hashing in reality.
+
+
+
+String Matching:
+Given two strings s and t, does s occur as a substring of t?
+Eg:
+	s = "You are fired"
+	t = Entire Email Inbox
+Simple Algorithm:
+any(s == t[i:i+len(s)]
+	for i in range(len(t)-len(s)))
+In this algorithm, almost all the substrings of t of length of s are sliced and compared with the original string.
+The running time of the algorithm is usually, Q(len(s) * len(t-s)) but it is typically,
+	T = O(len(s).len(t)), since t >> s.
+Now, to form an algorithm which runs at time,
+	T = O(len(s) + len(t))
+Idea - Comparing the hashes of strings is faster than comparing strings.
+
+1. Rolling Hash ADT:
+a variable r maintains a string x
+- r.append(c)
+	add character c to the end of x
+- r.skip(c)
+	delete the first character of x (assuming it is c)
+For each addition of character c, r() gives the hash value of x = hash(x) where hash is a reasonable hash function.
+
+2. Karp-Rabin Algorithm:
+for c in s: rs.append(c)	- to do once, here rs gives the has value of s i.e, rolling hash of s
+for c in t[:len(s)]:
+	rt.append(c)		- rt = rolling hash of t and is hash of first s values of t
+if rs() == rt():
+	found match		- to check if they are equal first
+for i in range(len(s), len(t)):	- check for all the remaining characters in t
+	rt.skip(t[i-len(s)])	- throw away the first letter
+	rt.append(t[i])		- add the next letter
+	if rs() == rt():		- still probability to not be true due to collision
+		if s == t[i-len(s)+1:i+1]:	- check the string character by character
+			found match
+		else:
+			happens with probability <= 1/len(s)
+		=> O(1) amortized expected time
+
+Therefore, time complexity is,
+	T = O(len(t) + len(s) + #matches.(len(s)) -> expected time
+On overall average,
+	T = O(len(t) + len(s))
+
+Even a simple hash function for eg: the division hash method holds according to the karp-rabin method.
+Division method => hash(k) = k mod m, where m is a random prime >= len(s)
+Larger m makes the probability higher to be true
+
+Let's look at an append operation,
+treat x as multidigit number u in base a -> alphabet size
+
+r.append(c);
+	u = u.a + ord(c)
+	r = r.a + ord(c) mod m
+r.skip();
+	u = u - c.a^(len(u)-1)
+
+
+
+
+
+HASING III:
+Open Addressing
+Uniform Hashing Analysis
+Cryptographic Hashing
+
+
+Open Addressing:
+No chaining - Way to implement hash tables
+Assume an array structure with items
+
+	_______ item1		one item per slot
+	_______ item2
+	_______   .		also m >= n
+	_______   .
+	_______   .		m = size of/no of slots in table, n = no. of items
+	_______ item m
+
+Probing:
+-Try to see if we can insert something into the hash table, and if we fail recompute slightly different hash for tbe key and iteratively continuously probe till we find a key to index.
+-We need a hash function which specifies the order of slots to probe for a key ( for insert/search/delete ).
+-Our hash function h takes Universe of keys U / the keyspace U and also take the trial count which is an integer b/w 0 to m-1.
+	h : U * {0, 1, 2, ..., m-1} --> {0, 1, 2, ..., m-1}
+-It is going to produce just like the chaining hash functions a number b/w 0 to m-1, where m is the no of slots in the table.
+-To ensure we are using the hash table corresponding to open addressing properly, the property
+	h(k,1),  h(k,2),  ...  , k(k,m-1)	to be a permutation of 0,1,...,m-1
+	arbitrary
+	key k
+-This ensures all slots in the table are equal opportunity slots.
+
+-Let's consider a table and do insert operation
+	0 _______	Let's consider,	inert 586     h(586, 1) = 1
+	1 ____586	h(133, 1) = 2
+	2 ____133	h(204, 1) = 4
+	3 ____496	h(481, 1) = 6
+	4 ____204	h(496, 1) = 4	-   fails
+	5 _______	h(496, 2) = 1	-   fails
+	6 ____481	h(496, 3) = 3
+	7 _______
+
+-Use None to indicate an empty slot (Flag)
+-Insert(k, v)
+-Keep probing until an empty slot is found.
+-Insert item when empty slot is found.
+
+-For Search(k), as long as the slots encountered are occupied by keys!= k, keep probing until you either encounter k or find an empty slot.
+-For deletion, there might occur a problem.
+	If we first delete 586, None is replaced in its slot whose index was 1.
+	And then if we search for 496, empty slot on 1 is first encountered and it is decided that 496 is not in the table which is incorrect.
+	Therefore, when deleting an item, replace the item with not a None flag but rather a deleteMe flag. Thus, even if a deleteMe flag is encountered, the search continues till either the key or a None flag is encountered.
+-For insert operation, treat the deleteMe flag the same as None.
+
+Probing Strategies:
+1. Linear Probing:
+-h(ki) = (h'(k)+i)mod m,	    where h'(k) is the ordinary hash function.
+-Problem with this approach - clustering
+	The groups of linear cluster keeps growing. Bigger the size is, more likely to grow more.
+	40 _______
+	41 _______
+	42 ____no1	If a new hash h(k, i) = 42, then the cluster of size 15 has to be gone through entirely and inserting k
+	 . ____ .	just adds up to the size of the cluster.
+	 . ____	.
+	 . ____	.
+	57 ____no15
+	58 _______
+
+	0.01 <= @(alpha/load factor) <= 0.99
+					Q(logn) size clusters.
+	If there are clusters of Q(logn) size, then the insertion, search are not linear time anymore even in probabilistic models.
+
+2. Double Hashing:
+-h(k, i) = (h1(k) + i.h2(k)) mod m
+	If h2(k) is relatively prime to m => implies a permutation
+-m = 2^r, h2(k) for all k is odd.
+
+
+Uniform Hashing Assumption: (Not the same as simple uniform hasing which talks about independence of keys in terms of their mapping to slots.)
+-Each key is equally likely to have any one of the m! permutations as it's probe sequence.
+-There's probably no deterministic hash function that satisfies this property accurately.
+-Double hashing gives this property to a good extent.
+-If @(alpha) = n/m,	   Cost of operations such as  search, insert, delete <= 1/(1-@).
+			   As @ -> 1, the cost is great as almost each slot has to be probed atleast once.
+			   So the size of the table must be maintained so that @ stays more than 0.5 or 0.6 .
+
+Hashes that are used for some other applications:
+Eg: For password storage.
+One-way	,  given h(x) = Q, it is very hard to find x so that h(x) = Q.
+/etc/password: devadas :  x12467
+(Password      (password)  (hashed password in memory)
+Directory)
+If a password x' is typed in then h(x') = h(x) is checked.
+
+
+
+
+Integer Arithmetic:
+-Even the x64 bit systems are incapable of computing high precisions say if we want to find the value of some digit accurate to 100 decimal points or the square root of 2, or the 22/7(pie) value to a 100 decimal places.
+-To do that on a computer, techniques such as Newton's method can be used to calcuate irrational numbers of arbitrary precision.
+-Multiplying or doing some other operations on numbers that are thousands of bits long also are need such mathematical methods.
+
+Irrationals:
+Pythagoras - a squares diagonal and sides are incomensurable i.e, can't be expressed as a proper rational fraction.
+(Babylonians and Indians knew this way before Pythagoras did)
+Since sqrt(2) can't be expressed in numbers or be measured, they named these numbers "speechless" (irrationals) and considered irrationals a threat.
+They were also unable to find patterns.
+So, high precision arithmetics are quite useful if possible to compute.
+
+sqrt(2) = 1.414 213 562 373 095 048...
+There obviously is no pattern, it would be nice to have a computer program to generate this sequence and another program to look up for a pattern.
+
+Catalan Numbers:
+Set P of balanced paranthesis strings, and we'll recursively define these strings as follows,
+	1. ^ E P (lambda belonging to P where ^ is the empty string)
+	2. if @,B E P, then (@)B E P
+We can get every non empty balanced paranthesis string via Rule 2 from a unique @,B pair
+(())()() obtained by ( () ) ()()
+		       __   ____
+		       @     B
+
+Enumeration:
+To enumerate the catalan number and get the cardinality of the set,
+Cn: number of balanced paranthesis strings with exactly n pairs of paranthesis
+for base case,
+	C0 = 1 (empty string)
+	C1 = 1 [()]
+	C2 = C0C1 + C1C0 = 2
+
+	n
+Cn+1 =  E CkCn-k	, n >= 0
+	k=0
+
+C3 = C0C2 + C1C1 + C2C0 = 1.2 + 1.1 + 2.1 = 2 + 1 + 2 = 5
+C4 = C0C3 + C1C2 + C2C1 + C3C0 = 5 + 2 + 2 + 5 = 14
+
+Similarly, Catalan number sequence is:
+	1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, 58786, 208012, 742900, 2674440, 9694845, 35357670, 129644790, 477638700, 1767263190, 6564120420, 24466267020, 91482563640, ...
+
+So, heading back to irrationals and see how we can compute sqrt(2) and other things to an arbitrary precision.
+
+
+NEWTON's METHOD:
+for a function,
+	y = f(x)
+	try and find the root of f(x) = 0  through successive approximation.
+
+	for eg: if f(x) = x^2 - a,
+	In this equation, if a is 2, then we are trying to compute square root of two.
+		For the newton's method,
+		if for some x = xi, y = f(xi), then the tangent line drawn at y = f(xi) intercepts the x axis at some point and this point is taken to be the successive x coordinate i.e, xi+1 and this process is continued till y = f(x) = 0 is reached.
+		At the point y = f(xi), the equation of the tangent is,
+			y = f(xi) + f'(xi).(x-xi)
+
+		Now, for the value of xi+1,
+			xi+1 = xi - (f(xi)/f'(xi))
+
+		if f(x) = x^2 - a,
+			xi+1 = xi - ((xi^2 - a)/2*xi)
+			xi+1 = (xi^2 + a)/2*xi
+			xi+1 = (xi + a/xi)/2
+
+	If this Newton method is run on a = 2, with x0 = 1 then,
+		x0 = 1
+		x1 = 1.5
+		x2 = 1.4166666666666665
+		x3 = 1.4142156862745097
+		x4 = 1.4142135623746899
+		x5 = 1.414213562373095
+
+
+	Consider, we know the digits of precision beforehand,
+	Find sqrt(2) to d-digit precision
+		We want an integer floor(10^d.sqrt(2)) = floor(sqrt(2.10^2d))
+		Let's still use newton's method
+
+High precision multiplication:
+We have two n digit numbers (radix/base = 2, 10)
+0 <= x,y <= r^n;	set x = x1.r^(n/2)+x0
+			    y = y1.r^(n/2)+y0
+
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+Lecture 11 - Karatsuba multiplication, Integer Arithmetic	- incomplete
+Lecture 12 - Square roots, Newton's Method 			- incomplete
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+
+
+
+Graph Search:
+	It is about exploring a graph.
+	Eg: given a node s in a graph g, and node t in the same graph g, finding a path between them both.
+
+	Recalling Graphs:
+	graph G = (V, E) -> set of vertices and edges
+	V = set of vertices
+	E = set of edges
+	undirected graph	e = {v, w} - unordered pairs
+		Eg:
+		V = {a, b, c, d}
+		E = {{a,b}, {b,d}, {c,d}, {a,c}, {a,d} }
+	directed graph  	e = (v, w) - ordered pairs
+		E = {(a,c), (c,b), (b,c), (b,a)}
+
+	Better ways to represent a graph - adjacency list, adjacency matrix.
+
+Applications:
+Web crawling
+Social Networking - Eg: Friends of friends
+Network broadcast
+Garbage collection
+Model checking
+Checking mathematical conjuctures
+Solving puzzles and games.
+	Eg: 2*2*2 rubix cube:
+		Configuration graph
+		 Vertex for each possible state of the cube
+		 No. of vertices = 8!*3^8
+				 = 264, 539, 520 (Still capable by processors to solve)
+
+	for 2*2*2, worst case is 11 moves.
+	for 3*3*3, worst case is 20 moves.
+	for 4*4*4 and above, worst case no. of moves is unknown.
+
+	by recent paper,
+	for n*n*n, the worst case is Q(n^2/logn)
+
+Graph Representation:
+Adjacency list:
+	Array adj of size |V|
+	Each element in array is pointer to linked lists
+	for each vertex u E V,
+		adj[u] stores u's neighbors i.e,
+		adj[u] = {v E V | (u,v) E E}  i.e, (u,v) is an Edge
+
+	Eg:
+	a
+	^\
+	| \
+	|  >
+	b-->c
+	 <--
+	adj[a] = {c}
+	adj[b] = {a,c}
+	adj[c] = {b}
+
+	At a linked list point of view,
+		a| |--> |c|/|
+	adj => 	b| |--> |a| | -> |c|/|
+		c| |--> |b|/|
+	A hash table could be used instead of arrays if vertices are weird.
+
+	Object oriented:
+		v.neighbors = adj[v]
+
+	Implicit representation:
+		adj[u] is a function
+		v.neighbors() is a method
+
+	The space required by the adjacency list representation is Q(|V|+|E|)
+
+
+Breadth First Search:
+Back edge could take place in an undirected graph.
+Visit all nodes reachable from given node s E V.
+Achieve O(V+E) time.
+Idea is to look at nodes that are reachable first in 0 moves({s}), 1 move(adj[s]), 2 moves, ...
+Careful to avoid duplicates.
+
+BFS(s, adj):
+	level = {s: 0}
+	parent = {s: None}
+	i = 1
+	frontier = [s]
+	while frontier:
+	    next = []
+	    for u in frontier:
+		for v in adj[u]:
+		    if v not in level:
+			level[v] = i
+			parent[v] = u
+			next.append(v)
+	    frontier = next
+	    i += 1
+
+	Eg:
+	a - s   d - f
+	|   | / | / |
+	z   x - c - v
+
+Shortest Paths:
+- v <- parent[v]
+    <- parent[parent[v]]
+    <- ...
+    <- s
+	is a shortest path from s to v
+
+	The running time of the algorithm would be,
+	     E |adj[v]| = 2*|E| for undirected graphs; |E| for directed graphs
+	   v in V
+
+
+
+Depth First Search(DFS):
+Recursively explore the graph, backtracking as necessary.
+    DFS-Visit:
+	parent = {s:None}
+	DFS-Visit(V, adj, s):
+	    for v in adj[s]:
+		if v not in parent:
+		    parent[v] = s
+		    DFS-Visit(V, adj, v)
+
+	Need to be careful not to repeat visiting vertices
+	This code only visits vertices reachable from s.
+
+
+    DFS(V, adj):
+	parent = {}
+	for s in v:
+	    if s not in parent:
+		parent[s] = None
+		DFS-Visit(V, adj, s)
+
+    The running time for this algorithm is Q(V+E) which is the size of input and is linear time.
+    The reason is every vertex in V is visited once in this algorithm in the DFS alone	- O(V).
+    DFS-visit(.., .., v) is called once per vertex v	- len(adj[v]).
+    Therefore, the time complexity is, O(  E(len(adj[v]) ) = O(E).
+					 v in V
+    Just like BFS, DFS also do work in linear time.
+    Unlike BFS, DFS cannot be used to find the shortest paths. It can be very useful in the way it classifies edges.
+
+
+Edge Classification:
+Every edge in a directed graph get visited once and twice in an undirected graph.
+When visiting an edge,
+	Tree edges	- If an edge led to something unvisited, then it is called tree edge (parent pointer).
+	Forward edges	- The edge that goes from a node to a descendant in the tree.
+	Backward edges	- The edge that goes from a node to its ancestor in the tree.
+	Cross edges	- Cross edge is between two non ancestor related subtrees/nodes.
+
+    For tree edges - Every parent pointer corresponds to the reverse of a tree edge and hence straightforward to identify.
+
+    For backward edges,
+	Mark which nodes are currently being explored at the beginning of s and at the end of for loop mark it finished. Eg: s.inprocess = True, s.inprocess = False. During the inprocess, if followed an edge and find an edge already in the stack then the edge is a backward edge.
+
+    For forward edges,
+	Every time any vertex is visited or any operation is performed, a counter is incremented and the value is stored for start time for s and finish time for s. With the value of the counters, it can be inferred if the edge is a forward edge or backward edge.
+
+    For tree edges - The edge between two visited vertices with forward edges.
+
+For an undirected graph, only tree edges and backward edges exist. Forward and cross edges do not exist in an undirected graph.
+Edge classification can be handy and useful because they can be used to detect cycles in graph which is a very intuitive problem and also in performing topological sort.
+
+
+Cycle Detection:
+G has a cycle	 <=> 	DFS has a back edge
+	    if and only if
+
+	(ancestor)n0 -> n1 -> n2 -> n3 -> n4(descendant)
+		  |			   |
+		  |-------------<----------|
+			backward edge
+
+	=>	v2 -->-- v3
+	       |	   \
+	       ^	    >
+	       |	     \
+	       v1	      v4
+		\	      |
+		 <	      .
+		  \	      .
+		  `v0`---<--- vk
+	Here, assume v0 is the first vertex in the cycle visited by DFS.
+	Claim: (vk, v0) is a back edge
+
+	v1 visited before finish v0
+	vi visited before finish vi-1
+		     .
+		     .
+		     .
+	vk visited before finish v0
+
+	The order is like,
+		start v0
+		   .
+		   .
+		   .
+		start vk
+		   .
+		   .
+		   .
+		finish vk
+		   .
+		   .
+		   .
+		finish v0
+
+	vk would be finished before v0 since v0 starts first. Just like the balanced paranthesis (...(...)...)
+												 0   k   k   0
+	Hence, the edge (vk, v0) would be a back edge.
+
+
+Job Scheduling:
+Given a directed acyclic graph(DAG), order the vertices so that all edges point from lower order to higher order (First the predecessor and then the descendant).
+
+DAG eg:
+	G ->- H	   I
+	    /
+	   >
+	  /
+	A ->- B ->- C ->- F
+	      |		  |
+	      ^		  ^
+	      |		  |
+	      D  --->---  E
+
+
+Topological Sort:
+run DFS
+output - reverse of finishing time of vertices.
+
+Correctness:
+	For any edge e = (u, v), v finishes before u finishes
+
+    Case 1: u starts before v
+	`u`-->-- v
+	 |	 |
+	 | -->-- |
+	Visit v before u finishes
+
+    Case 2: v starts before u
+	u -->--`v`
+	|	|
+	| --<-- |
+	v will finish before visit u as there are no cycles in the graph.
+
+
+
+
+
+Single-Source Shortest Paths Problem:
+	The graph edges along with undirected or directed, have weights on them.
+
+Motivation:
+	Find the shortest way of getting from one point to another, eg: Google Maps.
+	A graph, G(V, E, W); 	V - Vertices
+				E - Edges
+				W - weight function mapping edges to weights, E -> R (set of real numbers)
+
+    Two algorithms to be implemented:
+	1. Dijkstra :
+	    assumes non-negative weighed edges
+	    has complexity of O(VlogV + E)
+
+	    Consider a hexagon which has 6 corners, the no. of intermediary lines/edges possible in the structure would be 5*6/2, i.e, n(n-1)/2
+	    Similarly, the value of E given V vertices could be round up to,
+		E = O(V^2)
+
+	    Therefore, in terms of the no. of edges E, Dijkstra has a linear complexity (O(VlogV + E) = O(VlogV + V^2) = O(V^2) = O(E))
+
+	2. Bellman-Ford Algorithm:
+	    Works on +ve, -ve weight edges
+	    It has a complexity of O(VE)   (So, Dijkstra is better in most situations unless there are negative weights)
+
+
+    Let path p = <v0, v1, v2, ..., vk> ,	Sequence of vertices
+	This is the path for
+		(Vi, Vi+1) E E ,  for 0 <= i < k
+
+	      k-1
+	w(p) = E w(vi, vi+1) ,	weight of the path
+	      i=0
+
+    Shortest path problem comes down to,
+	find p with minimum weight
+
+    There are potentially exponential no. of paths in the graphs we consider,
+	Eg:
+	    v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5 ->- v6
+	      \		 /  \	       /  \	     /
+		--->----      --->----      --->----
+	Here, there are 2 ways of getting from v0 to v2, 4 ways of getting from v0 to v4, 8 ways of getting from v0 to v6, hence exponential paths potentially.
+
+    From the complexity equations of both the equations, it is evident that the time required to solve the shortest path problem is independent of the weight function and only depends on the no. of vertices, edges.
+
+    Due to the dynamic range of the weights, BFS, DFS cannot be used to solve the shortest paths problem.
+
+
+
+Weighted Graphs:
+	Let, a path p be from v0 to vk
+	     p
+	v0 -->-- vk
+	Two Extreme conditions:
+	    (v0) is a path from v0 to v0 of weight 0.
+	    Shortest path weight from  u to v as,
+							   p
+		shortestPathWeight(u,v) = { min{ w(p); u -->-- v} iff there exists any such path
+					    infinity;		  otherwise	}
+
+	Eg:
+			    2
+		  ---------->----------
+		  |    5    ()   3    |
+		()A --->--- C --->--- E()
+		/ | \       |       / |
+	     1 ^  |  |      |      /  |
+	      /   |  |      |     /   |
+	  (0)S  1 ^  v 3  2 ^  1 v    v 4
+	      \   |  |      |   /     |
+	     2 v  |  |      |  /      |
+		\ | /       | /       |
+		()B --->--- D --->--- F()
+		       1    ()   1
+	To find,
+	    shortestPathWeight(S, A), shortestPathWeight(S, B), shortestPathWeight(S, C), etc...
+	Let, the number inside each vertices d(u) be the current weight of w.(By default d(S) would be 0 and all others i.e, d(A), d(B), etc would be infinity).
+
+			    2
+		  ---------->----------
+		  |    5   (6)   3    |
+	       (1)A --->--- C --->--- E(3)
+		/ | \       |       / |
+	     1 ^  |  |      |      /  |
+	      /   |  |      |     /   |
+	  (0)S  1 ^  v 3  2 ^  1 v    v 4
+	      \   |  |      |   /     |
+	     2 v  |  |      |  /      |
+		\ | /       | /       |
+	       (2)B --->--- D --->--- F()
+		       1   (3)   1
+	Here, a better path is present for S -->-- C, and hence d value is changed to 5.
+
+			    2
+		  ---------->----------
+		  |    5   (5)   3    |
+	       (1)A --->--- C --->--- E(3)
+		/ | \       |       / |
+	     1 ^  |  |      |      /  |
+	      /   |  |      |     /   |
+	  (0)S  1 ^  v 3  2 ^  1 v    v 4
+	      \   |  |      |   /     |
+	     2 v  |  |      |  /      |
+		\ | /       | /       |
+	       (2)B --->--- D --->--- F()
+		       1   (3)   1
+	Hence, the path with least no. of edges does not mean the path with minimum weight.
+	Along with the shortestPathWeight, we also need means to find the path/sequence of vertices associated with the weight.
+
+	We have,
+	    d(v) : value inside circle, current weight		(desirable to approach shortestPathWeight(u, v)
+	    pi(v): predecessor on current best path to v	pi(S) = Nil
+
+
+
+Bellman-Ford Algorithm:
+Graphs with negative/-ve weights.
+Eg: Reverse tolls, Social Networks
+
+Negative Cycles:
+What if the negative cycles didn't even terminate, eg:
+
+	        ()C
+		/ | \
+	     3 ^  |  v -2
+	      /   |   \
+	   ()B  2 ^    E()
+	  /   \   |   /
+       4 ^  -6 v  |  v 1
+	/       \ | /
+     ()S        ()D
+	\
+	 v 2
+	  \
+	   A()
+    A negative cycle could lead to an infinite loop.
+    For eg: in the above graph,
+	d(S, B) = 4 in the first traversal.
+	Then as it goes through D ->- C ->- B, a reduction of 1 takes place resulting in,
+	    d(S, B) = 3
+	    and as the loop proceeds, it keeps on decreasing in the same fashion resulting in an infinite loop/logical error.
+	d(S, S) = 0, d(S, A) = 2. These two are fixed since they don't touch negative cycles, and can't return once a negative cycle is reached.
+
+    Bellman-Ford has to detect negative cycles and Dijkstra doesn't have to do that hence it is relatively simple.
+
+General Structure of Shortest Path Algorithms:
+    Initialise for u E V,    d[v] <-- infinity,    pi(u) <-- NIL,    d(s) <-- 0
+    What we do is repeat select edge[u,v]	(Somehow)
+
+    "Relax" edge(u,v) ;    notion of relaxation is that, if d[v] > d[u] + w(u,v)
+				(i.e, we've discovered a better way of getting to v than the current value to v which could be infinity, and d[u] is a finite number and also edge (u,v) exists.Hence, the value of d[v] is updated and this is called relaxation of edge(u,v).
+	Therefore, set
+	    d[v] = d[u] + w(u,v)
+	    pi[v] <-- u
+
+	Repeat until all edges have d[v] <= d[u] + w(u,v)
+    Therefore, for this method all the vertices around the required end vertex are assigned a d(u) path value and checked with the current d(v) so that it could not be improved any further.
+    The termination condition could take Q(E) time since so many edges would have to be compared and this is a brute force algorithm which would work for graph with no negative cycles, but just less efficient.
+
+		4     4	      2	     2	    1	   1
+	    v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5 ->- v6 ->- v7 ->- v8 ->- v9
+	      \		 /  \	       /  \	     /  \	   /
+		--->----      --->----      --->----      --->----
+		   4		 2	       1
+	Another reason for not implementing this algorithm is,
+	    If we had an exponential range of weights similar to the above one, we would have 2^(n/2) range of dynamic weights given the graph has n vertices.
+	This graph could be considered a fragment of a large graph where n = 50 or n = 100. Assuming all edges are non-negative dijkstra should be able to run on it.
+
+		   4		 2	       1
+		--->----      --->----      --->----      --->----
+	      /		 \  /	       \  /	     \  /	   \
+	    v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5 ->- v6 ->- v7 ->- v8 ->- v9
+		4      4      2	     2	    1	   1
+	On running this algorithm and just following the straight chain of vertices, the weights would be
+	     0      4      8     10     12     13     14
+	By relaxing using the overhead edges, the distances could be reduced for example,
+	     0      4      8     10     12     13     13
+	     0      4      8     10     10     11     12
+	     0      4      8     10     10     11     11
+
+	Therefore, for a pathological ordering or a bad ordering, that corresponds to the end path weights reducing in steps of 1 i.e, 14, 13, 12, 11 respective to the selection of edges.
+	By this way, the if the overall weight when we start out is to be of the order of 2^(n/2), then we'll have to relax the edges for an exponential number of times.
+	This makes this algorithm an exponential time algorithm. Thus, Bellmann, Dijkstra algorithms will have to do better than that.
+
+
+Optimum Substructure:
+The subpath of a shortest path are shortest paths.
+    For eg:
+	v0 -->-- v1 -->-- v2 -->-- v3
+	     p1	      p2       p3
+	If p1+p2+p3 is the shortest path from v0 to v3, then p1, p2, p3 are also shortest paths respectively between the respective nodes.
+
+    Also,
+	     d(v0, v1)
+	v0 ------>------ v1
+	|		 |
+	vd(v0, vt)	 ^d(vt, v1)
+	|		 |
+	--------vt-------
+	Here, if d(v0, v1) is the shortestPathWeight(v0, v1), then
+	    d(v0, v1) <= d(v0, vt)+d(vt, v1)
+
+
+    During the relaxation operation, the d[v] value as well as the pi[v] value is updated.
+    Relax(u, v, w):
+	if(d[v] < d[u]+w(u, v)):
+	    d[v] = d[u]+w(u, v)
+	    pi[v] = u
+
+    To make sure relaxation is safe,
+	Lemma:	The relaxation operation maintains the invariant that d[v] >= d(S, v) for all v E V.
+	Proof:
+	    By induction on the no. of steps in the sense that we are going to essentially assume,
+		d[u] >= d(S, u)
+	    By the triangle inequality,
+		d(S,v) <= d(S,u) + d(u,v)
+	    =>  d(S,v) <= d[u] + w(u,v)	;	(d[u] + w(u,v) = d[v])
+	    =>  d(S,v) <= d[v]
+	Hence, we have a relaxation algorithm that is safe.
+
+
+Directed Acyclic Graphs(DAGS): Can't have negative cycles/cycles in general.
+    We could have negative edges but not negative cycles.
+    1) Topological Sort the DAG, path from u to v implies that u is before v in the ordering.
+    2) One pass left to right over the vertices in topologically sorted order relaxing each edge that leaves each vertex.
+	O(V+E) algorithm.
+
+    Once topologically sorted, a DAG can be drawn in linear form.
+		      6
+	         ----->-----   ----->-----
+	    5   /  2	  7 \ /	-1     -2 \
+	v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5
+	  \    3      /|\     4    /	    |
+	   ---->-----  | ----->----	    |
+		       |	 2	    |
+		       ---------->-----------
+
+    If v5 is the source for instance, there is no edge going out of it and everything to the left of it gets marked infinity.
+
+    Now, let v1 be the source.
+		      6
+	         ----->-----   ----->-----
+	    5   /  2 (inf)7 \ /	-1(inf)-2 \
+   (inf)v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5(inf)
+	  \   (0)    / |\   (inf)  /	    |
+	   ---->-----  | ----->----	    |
+	       3       |      4 	    |
+		       ---------->-----------
+				 2
+
+			|
+			V
+
+    The edges going out of v1 are relaxed, i.e, to v2, v3.
+
+		      6
+	         ----->-----   ----->-----
+	    5   /  2 (2)  7 \ /	-1(inf)-2 \
+   (inf)v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5(inf)
+	  \   (0)    / |\   (6)    /	    |
+	   ---->-----  | ----->----	    |
+	       3       |      4 	    |
+		       ---------->-----------
+				 2
+
+			|
+			V
+
+    Now, the edges going out of v2 are compared and relaxed, i.e, to v3, v4, v5.
+
+		      6
+	         ----->-----   ----->-----
+	    5   /  2 (2)  7 \ /	-1 (6) -2 \
+   (inf)v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5(4)
+	  \   (0)    / |\   (6)    /	    |
+	   ---->-----  | ----->----	    |
+	       3       |      4 	    |
+		       ---------->-----------
+				 2
+
+			|
+			V
+
+    Now, the edges going out of v3 are compared and relaxed, i.e, to v4, v5.
+
+		      6
+	         ----->-----   ----->-----
+	    5   /  2 (2)  7 \ /	-1 (5) -2 \
+   (inf)v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5(4)
+	  \   (0)    / |\   (6)    /	    |
+	   ---->-----  | ----->----	    |
+	       3       |      4 	    |
+		       ---------->-----------
+				 2
+
+			|
+			V
+
+    Now, the edges going out of v4 are compared and relaxed, i.e, to v5.
+
+		      6
+	         ----->-----   ----->-----
+	    5   /  2 (2)  7 \ /	-1 (5) -2 \
+   (inf)v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5(3)
+	  \   (0)    / |\   (6)    /	    |
+	   ---->-----  | ----->----	    |
+	       3       |      4 	    |
+		       ---------->-----------
+				 2
+
+	This is a really simple example of dynamic programming.
+
+
+
+Dijkstra Algorithm(Greedy Algorithm):
+
+    Eg:
+	     Y ---4--- R	If G is the source vertex,
+	   / |       / |	    G  P  B  Y  R
+	 19  |      /  |	       7  12 18 22
+	 /   |     /   |
+       G    11   15   13	If R is the source vertex,
+	 \   |   /     |	    R  Y  B  P  G
+	  7  |  /      |	       4  13 15 22
+	   \ | /       |
+	     P ---5--- B
+
+    Dijkstra(G, W, s)
+	Initialize(G, s)	S <- None,	Q <- V[G]  (Priority Queue)
+	while Q != None:
+	    u <- Extract_min[Q]		//delete u from Q
+	    S <- S + {u}
+	    for each vertex v E adj[u]:
+		Relax(u, v, w)
+
+
+
+   Let's go through first few steps of Dijkstra's execution:
+
+	      (inf)   2     (inf)
+	    --- B ---->------ D
+	   /   / \        /  / \
+	10^   |   |      /  |	|
+	 /    |   |     /   |   |
+     (0)A    1v  4^   8^   9^	v7
+	 \    |   |   /     |	|
+	 3v   |   |  /      |	|
+	   \   \ /  /        \ /
+	    --- C ---->------ E
+	      (inf)   2     (inf)
+
+	   S = {}	   Q = {A,  B,  C,  D,  E}
+				0 inf inf inf inf	In this step, for u = extract_min, select 0 and correspondingly A.
+	=> S = {A}	        0  10   3 inf inf 	In this extract min step, select 3, correspondingly C.
+	=> S = {A, C}		0   7   3  11   5	Select 5, E
+	=> S = {A, C, E}	0   7   3  11   5	Select 7, B
+	=> S = {A, C, E, B}	0   7   3   9   5	Select 9, D
+	=> S = {A, C, E, B, D}	0   7   3   9   5
+
+
+    Complexity of the Dijkstra algorithm:
+	Q(V) inserts into the Priority Queue
+	Q(V) extract_min operations
+	Q(E) Decrease key operations
+
+	For priority queues, if array data structure is used,
+	    extract_min: Q(V)
+	    decrease key: Q(1)
