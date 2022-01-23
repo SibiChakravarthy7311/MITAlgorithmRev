@@ -43,3 +43,42 @@ print(path)
 for i in range(len(path)-1):
     print(path[i], end=' -> ')
 print(path[-1])
+
+
+vertexStackDict = {}
+vertexStack = []
+visited = {}
+topologicalOrder = []
+
+
+def DFS(vertices, adj, s):
+    topologicalOrder.append(s)
+    DFSVisit(adj, s)
+    for i in vertices:
+        if i not in visited:
+            if DFSVisit(adj, s):
+                print()
+            
+
+def DFSVisit(adj, s):
+    if s in visited:
+        return True
+    print(s, end=" -> ")
+    visited[s] = True
+    if s not in vertexStackDict:
+        vertexStackDict[s] = len(vertexStack)
+        vertexStack.append(s)
+    # print(vertexStack, vertexStackDict)
+    for i in adj[s]:
+        # if i in vertexStackDict:
+        #     return True
+        if DFSVisit(adj, i):
+            continue
+        vertexStack.pop()
+        topologicalOrder.append(i)
+        del vertexStackDict[i]
+        # print(vertexStack, vertexStackDict)
+
+
+DFS(vertices, adj, 's')
+print(topologicalOrder)

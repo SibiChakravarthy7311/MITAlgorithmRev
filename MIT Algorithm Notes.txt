@@ -1491,9 +1491,9 @@ Adjacency list:
 	adj[c] = {b}
 
 	At a linked list point of view,
-		a| |--> |c|/|
+			a| |--> |c|/|
 	adj => 	b| |--> |a| | -> |c|/|
-		c| |--> |b|/|
+			c| |--> |b|/|
 	A hash table could be used instead of arrays if vertices are weird.
 
 	Object oriented:
@@ -1546,9 +1546,8 @@ Shortest Paths:
 	   v in V
 
 
-
 Depth First Search(DFS):
-Recursively explore the graph, backtracking as necessary.
+- Recursively explore the graph, backtracking as necessary.
     DFS-Visit:
 	parent = {s:None}
 	DFS-Visit(V, adj, s):
@@ -1604,19 +1603,19 @@ G has a cycle	 <=> 	DFS has a back edge
 	    if and only if
 
 	(ancestor)n0 -> n1 -> n2 -> n3 -> n4(descendant)
-		  |			   |
+		  |			   			   |
 		  |-------------<----------|
 			backward edge
 
 	=>	v2 -->-- v3
-	       |	   \
-	       ^	    >
-	       |	     \
-	       v1	      v4
-		\	      |
-		 <	      .
-		  \	      .
-		  `v0`---<--- vk
+        |	       \
+        ^	        >
+        |	         \
+        v1	          v4
+		 \	           |
+		  <	           .
+		   \	       .
+		   `v0`---<--- vk
 	Here, assume v0 is the first vertex in the cycle visited by DFS.
 	Claim: (vk, v0) is a back edge
 
@@ -2050,6 +2049,173 @@ Dijkstra Algorithm(Greedy Algorithm):
 	Q(V) extract_min operations
 	Q(E) Decrease key operations
 
-	For priority queues, if array data structure is used,
-	    extract_min: Q(V)
-	    decrease key: Q(1)
+	For priority queues,
+	if array data structure is used,
+	    extract_min:	Q(V)
+	    decrease key:	Q(1)
+	    Multiplication:	Q(V.V + E.1) = Q(V^2)
+
+	if Binary min-heap is used,
+	    extract_min:	Q(logV)
+	    decrease key:	Q(logV)
+	    Multiplication:	Q(VlogV + ElogV)
+
+	Fibonacci heap is an amortized data structure, which has,
+	    extract_min:	Q(logV)
+	    decrease key:	Q(1)
+	    Multiplication:	Q(VlogV + E)
+
+
+
+BellMan Ford Algorithm:
+If a graph has a source vertex u and negative weight cycle,
+Eg:
+				-ve Cycle
+			      --------<------
+      u			      | 	    |
+	v0 ->- v1 ->- v2 ->- v3 ->- ... ->- vn-1 ->- vn
+	    2	   3				  4
+Let all the other edges have positive weights.
+
+For an algorithm to work for this type of graph,
+	detect the existance of negative cycle
+	So, d(u, v3), d(u, vn-1), d(u, vn) are undefined.
+For v1,
+	d(u, v1) = 2	(Since, no negative cycles and simply a straightforward path of length 1)
+If, a vertex eg z is unreachable from u, then d(u, z) is infinite.
+
+
+
+General Structure of Shortest Path Algorithms:
+    Initialise for u E V,    d[v] <-- infinity,    pi(u) <-- NIL,    d(s) <-- 0
+    What we do is repeat select edge[u,v]	(Somehow, that corresponds to a minimum priority in a priority queue)
+
+    "Relax" edge(u,v, w) ;    notion of relaxation is that, if d[v] > d[u] + w(u,v), then d[v] = d[u] + w(u, v)
+    Keep doing this until no more relaxation is possible.
+
+    The two main problems faced in this procedure are,
+	1. Complexity:
+	    The complexity could be exponential time (even for a graph that has only positive edges).
+	We did have a view on the graph,
+
+		4     4	      2	     2	    1	   1
+	    v0 ->- v1 ->- v2 ->- v3 ->- v4 ->- v5 ->- v6 ->- v7 ->- v8 ->- v9
+	      \		 /  \	       /  \	     /  \	   /
+		--->----      --->----      --->----      --->----
+		   4		 2	       1
+		For which the complexity is exponential and in the order of O(n/2)
+
+	2.End Point/Termination:
+	    This algorithm will not even terminate if there is a negative weight cycle reachable from the source.
+
+
+	For the first problem, we had an efficient algorithm Dijkstra which solved the complexity problem.
+	But for the second problem in general case, if the graph is a DAG(Directed Acyclic Graph), then a topological sort can be effectively used to solve the problem. However, in a general case, an efficient algorithm needs to be formed to solve this issue.
+
+
+Bellman-Ford Algorithm:
+    Bellman_Ford(G, W, S):
+	Initialize()
+	for i = 1 to |V| - 1:
+	    for each edge(u, v) E E:
+		relax(u, v, w)
+
+    	for each edge(u, v) E E:
+	    if d[v] > d[u]+w(u, v):
+	    	report -ve cycle exists
+
+    # procedure for relaxation
+    relax(u, v, w):
+	if d[v] > d[u]+w(u, v):
+	    d[v] = d[u]+w(u, v)
+	    pi[v] = u
+
+    To Prove:
+	Theorem:
+	    If G = (V, E) contains no -ve weight cycles, then after Bellman-Ford finishes execution,
+		d[v] = d(S, v) for all v E V
+
+	Corollary:
+	    If a value d[v] fails to converge after |V|-1 passes, there exists a negative weight cycle reachable from S.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DYNAMIC PROGRAMMING:
+	Memorization and subproblems
+	Fibonacci
+	Shortest Paths
+	Guessing and DAG view
+
+	Dynamic programming in general is a powerful algorithm design technique
+	- DP ~ "careful brute force"
+	- DP ~ subproblems + "reuse"
+		- Split the problem into smaller subproblems, store the results of the subproblems and reuse them
+
+	Fibonacci Series Naive recursive method:
+	- Fn = Fn-1 + Fn-2
+	- F1 = F2 = 1
+	- In the recursion method T(n) >= T(n-2) => Here, we multiply by 2 each time and n is subtracted by 2 each time, hence this process is done n/2 and so the time complexity is, 2^(n/2)
+
+	Fibonacci series dynamic programming method:
+	fib(k) only recurses the first time it's called, for all k
+	Look for Fk in the dictionary if already computed, else compute for it and store the result in the dictionary.
+	memo = {}
+	fib(n):
+		if n in memo:
+			return memo[n]
+			if n <= 2:
+				return 1
+			else:
+				f = fib(n-1) + fib(n-2)
+				memo[n] = f
+				return f
+	- memorised calls cost O(1)
+	- no. of non memorised call is n:
+		fib(1), fib(2), fib(3), fib(4), ..., fib()
+	- Hence, the time complexity/running time is O(n)/linear
+	- The DP time complexity in this case is ~ recursion + memorization
+
+	DP:
+	- memorize(remember) and reuse the solutions(of the subproblems)
+	- big challenge in solving a dynamic programming is to figure out what are the subproblems. Somehow, they are designed to solve the actual problem.
+	- Solve these subproblems and store the results for reuse.
+
+	For any general DP problem, time complexity = no. of subproblems (recursions are not counted because the recursions are computed only once and referred every time and is almost always in constant time)
+
+	Bottom-Up DP algorithm:
+		fib = {}
+		for k in range(1, n+1):
+			if k <= 2:
+				f = 1
+			else:
+				f = fib[k-1] + fib[k-2]
+			fib[k] = f
+		return fib[n]
+	- This algorithm looks and moves in the same way as the DP recursion method, but uses iteration and does not involve repeated function calls, hence is more efficient. Since, it starts from 1, the values for fib[k-1], fib[k-2] always exist in the dictionary.
+	- exactly same computation as the memorized recursive version
+	- We do a topological sort of the subproblem dependency DAG - In order to compute Fn, we need Fn-1 and Fn-2 and so on...
+		  --->---   ------->------
+		 /       \ /              \
+		Fn-3 ->- Fn-2 ->- Fn-1 ->- Fn
+		 \	               /
+		  -------->--------
+	- Can often save space. i.e, We create a table of size n in the problem, but in this bottom-up approach, only the last two values need to be stored and accessed, hence the previously stored values can be removed. The running time is pretty obvious, since the accessing time is constant, running time is linear.
+
+
+	Shortest Paths: (S(s,v) for all v)
+		Guessing:
+			Don't know the answer? Then guess. Algorithmic concept is don't try any guess, try them all.
+			...try all guesses & take the best one.
+

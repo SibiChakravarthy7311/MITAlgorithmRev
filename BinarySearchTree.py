@@ -7,15 +7,15 @@ class Node(object):
     def insert(self, data):
         if self is None:
             return Node(data)
-        while(True):
-            if(data <= self.data):
-                if(self.left is None):
+        while True:
+            if data <= self.data:
+                if self.left is None:
                     self.left = Node(data)
                     break
                 else:
                     self = self.left
-            elif (data > self.data):
-                if (self.right is None):
+            elif data > self.data:
+                if self.right is None:
                     self.right = Node(data)
                     break
                 else:
@@ -33,9 +33,9 @@ class Node(object):
     def search(self, data):
         currentNode = self
         while currentNode is not None:
-            if(data < currentNode.data):
+            if data < currentNode.data:
                 currentNode = currentNode.left
-            elif (data > currentNode.data):
+            elif data > currentNode.data:
                 currentNode = currentNode.right
             else:
                 return currentNode
@@ -53,9 +53,9 @@ class Node(object):
         q.append(self)
         while q:
             cur = q.pop(0)
-            if(cur.left):
+            if cur.left:
                 q.append(cur.left)
-            if (cur.right):
+            if cur.right:
                 q.append(cur.right)
             print(cur.data, end=' ')
 
@@ -72,17 +72,17 @@ class Node(object):
             return None
 
         if root.data == data:
-            if(not root.left and not root.right):
+            if not root.left and not root.right:
                 return None
-            elif(root.left and root.right):
+            elif root.left and root.right:
                 pnt = root.right
                 while pnt.left:
                     pnt = pnt.left
                 root.data = pnt.data
                 root.right = self.deleteNode(root.right, root.data)
-            elif(root.left):
+            elif root.left:
                 return root.left
-            elif(root.right):
+            elif root.right:
                 return root.right
         elif root.data > data:
             root.left = self.deleteNode(root.left, data)
@@ -92,7 +92,7 @@ class Node(object):
 
     def height(self, data):
         node = self.search(data)
-        if(node):
+        if node:
             height = self.findHeight(node)
         else:
             return None
